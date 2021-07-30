@@ -41,16 +41,19 @@ class AdConfsController < ApplicationController
   def best
     return render json: {error_message: 'invalid params'} if params[:partner_id].blank? && params[:component].blank?
     
-    ad_confs = AdConf.where(partner_id: params[:partner_id], component: params[:component])
-    return render json: [] if ad_confs.blank?
+    ad_conf = Rails.cache.fetch("#{params[:partner_id]},#{component: params[:component]},#{params[:platform]},#{params[:country_code]}", expires_in: 12.hours) do
+      AdConf.where(partner_id: params[:partner_id], component: params[:component])
+      reutrn nil if ad_confs.blank?
+      
+      ad_confs_by_platform = ad_confs.where(platform: params[:platform])
+      return ad_confs.first if ad_confs_by_platform.blank?
 
-    ad_confs_by_platform = ad_confs.where(platform: params[:platform])
-    return render json: ad_confs.first if ad_confs_by_platform.blank?
+      ad_confs_by_country = ad_confs_by_platform.where(country_code: params[:country_code])
+      return ad_confs_by_platform.first if ad_confs_by_country.blank?
 
-    ad_confs_by_country = ad_confs_by_platform.where(country_code: params[:country_code])
-    return render json: ad_confs_by_platform.first if ad_confs_by_country.blank?
-
-    render json: ad_confs_by_country.first
+      ad_confs_by_country.first
+    end
+    render json: ad_conf
   end
 
   private

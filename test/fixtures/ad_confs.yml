@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  ad_code: MyString
+  component: 1
+  platform: 1
+  country_code: MyString
+  partner_id: 1
+
+two:
+  ad_code: MyString
+  component: 1
+  platform: 1
+  country_code: MyString
+  partner_id: 1
